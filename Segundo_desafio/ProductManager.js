@@ -15,7 +15,7 @@ class ProductManager {
                 console.log(`Error: El código del producto "${product.title}" ya está en uso`)
                 return
             } else {
-                let products = this.leerProductos()
+                let products = this.readProducts()
                 
                 product.id = this.nextId++
     
@@ -31,7 +31,7 @@ class ProductManager {
 
     getProducts () {
         try {
-            return this.leerProductos()
+            return this.readProducts()
         } catch (error) {
             console.error("Error al obtener los productos", error)
             return []
@@ -40,7 +40,7 @@ class ProductManager {
 
     getProductById (id) {
         try {
-            const product = this.leerProductos().find((p) => p.id === id)
+            const product = this.readProducts().find((p) => p.id === id)
             if (product) {
                 return product
             } else {
@@ -53,7 +53,7 @@ class ProductManager {
 
     deleteProduct (id) {
         try {
-            const products = this.leerProductos().filter((p) => p.id !== id)
+            const products = this.readProducts().filter((p) => p.id !== id)
             fs.writeFileSync(this.productosFile, JSON.stringify(products, null, 2))
             console.log("Producto eliminado con exito")
         } catch (error) {
@@ -63,8 +63,8 @@ class ProductManager {
 
     upDateProduct (id, producto) {
         try {
-            const product_index = this.leerProductos().findIndex((p) => p.id === id)
-            let products = this.leerProductos()
+            const product_index = this.readProducts().findIndex((p) => p.id === id)
+            let products = this.readProducts()
             if (product_index > -1) {
                 products[product_index] = producto
                 products[product_index].id = id
@@ -78,7 +78,7 @@ class ProductManager {
         }
     }
 
-    leerProductos () {
+    readProducts () {
         try {
             const data = fs.readFileSync(this.productosFile, 'utf8')
             return JSON.parse(data)
@@ -103,7 +103,7 @@ class ProductManager {
     }
 
     isCodeDuplicate (code) {
-        const products = this.leerProductos()
+        const products = this.readProducts()
         return products.some((p) => p.code === code)
     }
 }
