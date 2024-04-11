@@ -2,7 +2,6 @@ const ProductManager = require('./ProductManager.js')
 
 const productManager = new ProductManager()
 
-console.log("\n////////// TEST METODO: addProduct() //////////\n")
 
 writeProducts = async () => {
     await productManager.addProduct({
@@ -46,29 +45,34 @@ writeProducts = async () => {
     })
 }
 
-writeProducts().then(()=>{
+const test = async () => {
+    console.log("\n////////// TEST METODO: addProduct() //////////\n")
+    await writeProducts()
+
     console.log("\n////////// TEST METODO: getProducts() //////////\n")
-    productManager.getProducts().then((p) => console.log(p))
-    .then(() => {
-        console.log("\n////////// TEST METODO: getProductsById(2) //////////\n")
-        productManager.getProductById(2).then( (p) => console.log(p))
-        .then(() => {
-            console.log("\n////////// TEST METODO: deleteProduct(2) //////////\n")
-            productManager.deleteProduct(2).then(() => {
-                productManager.getProducts().then(p => console.log(p)).then(() => {
-                    console.log("\n////////// TEST METODO: upDateProduct(1) //////////\n")
-                    productManager.upDateProduct(1,{
-                        title: "Product A",
-                        description: "Descripción del producto A",
-                        price: 10.99,
-                        thumbnail: 'ruta/imagenA.jpg',
-                        code: "P001",
-                        stock: 20
-                    }).then( () => {
-                        productManager.getProducts().then( p => console.log(p))
-                    })
-                })
-            })
-        })
+    const products = await productManager.getProducts()
+    console.log(products)
+
+    console.log("\n////////// TEST METODO: getProductsById(2) //////////\n")
+    const product = await productManager.getProductById(2)
+    console.log(product)
+    
+    console.log("\n////////// TEST METODO: deleteProduct(2) //////////\n")
+    await productManager.deleteProduct(2)
+    const products_post_delete = await productManager.getProducts()
+    console.log(products_post_delete)
+    
+    console.log("\n////////// TEST METODO: upDateProduct(1) //////////\n")
+    await productManager.upDateProduct(1,{
+        title: "Product A",
+        description: "Descripción del producto A",
+        price: 10.99,
+        thumbnail: 'ruta/imagenA.jpg',
+        code: "P001",
+        stock: 20
     })
-})
+    const products_post_update = await productManager.getProducts()
+    console.log(products_post_update)
+}
+
+test()
