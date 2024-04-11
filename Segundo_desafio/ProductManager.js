@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs').promises
 
 class ProductManager {
     constructor () {
@@ -6,21 +6,21 @@ class ProductManager {
         this.nextId = 1
     }
 
-    addProduct (product) {
+    async addProduct (product) {
         try {
             if(!this.isProductValid(product)) {
                 console.log(`Error: El producto no es válido`)
                 return
-            } else if (this.isCodeDuplicate(product.code)){
+            } else if (await this.isCodeDuplicate(product.code)){
                 console.log(`Error: El código del producto "${product.title}" ya está en uso`)
                 return
             } else {
-                let products = this.readProducts()
+                let products = await this.readProducts()
                 
                 product.id = this.nextId++
     
                 products.push(product)
-                fs.writeFileSync(this.productosFile, JSON.stringify(products, null, 2))
+                await fs.writeFile(this.productosFile, JSON.stringify(products, null, 2))
                 console.log("Producto agregado correctamente")
             }
         } catch (error) {
@@ -29,18 +29,18 @@ class ProductManager {
         }
     }
 
-    getProducts () {
+    async getProducts () {
         try {
-            return this.readProducts()
+            return await this.readProducts()
         } catch (error) {
             console.error("Error al obtener los productos", error)
             return []
         }
     }
 
-    getProductById (id) {
+    async getProductById (id) {
         try {
-            const product = this.readProducts().find((p) => p.id === id)
+            const product = (await this.readProducts()).find((p) => p.id === id)
             if (product) {
                 return product
             } else {
@@ -51,24 +51,24 @@ class ProductManager {
         }
     }
 
-    deleteProduct (id) {
+    async deleteProduct (id) {
         try {
-            const products = this.readProducts().filter((p) => p.id !== id)
-            fs.writeFileSync(this.productosFile, JSON.stringify(products, null, 2))
+            const products = (await this.readProducts()).filter((p) => p.id !== id)
+            await fs.writeFile(this.productosFile, JSON.stringify(products, null, 2))
             console.log("Producto eliminado con exito")
         } catch (error) {
             console.error("Error al eliminar el producto\n",error)
         }
     }
 
-    upDateProduct (id, producto) {
+    async upDateProduct (id, producto) {
         try {
-            const product_index = this.readProducts().findIndex((p) => p.id === id)
-            let products = this.readProducts()
+            const product_index = (await this.readProducts()).findIndex((p) => p.id === id)
+            let products = await this.readProducts()
             if (product_index > -1) {
                 products[product_index] = producto
                 products[product_index].id = id
-                fs.writeFileSync(this.productosFile, JSON.stringify(products, null, 2))
+                await fs.writeFile(this.productosFile, JSON.stringify(products, null, 2))
                 console.log("Producto actualizado con exito")
             } else {
                 console.log("Error: Producto no encontrado")
@@ -78,9 +78,9 @@ class ProductManager {
         }
     }
 
-    readProducts () {
+    async readProducts () {
         try {
-            const data = fs.readFileSync(this.productosFile, 'utf8')
+            const data = await fs.readFile(this.productosFile, 'utf8')
             return JSON.parse(data)
         } catch (error) {
             if(error.code === 'ENOENT') {
@@ -102,8 +102,8 @@ class ProductManager {
         )
     }
 
-    isCodeDuplicate (code) {
-        const products = this.readProducts()
+    async isCodeDuplicate (code) {
+        const products = await this.readProducts()
         return products.some((p) => p.code === code)
     }
 }
