@@ -8,7 +8,10 @@ const productManager = new ProductManager()
 const cartManager = new CartManager()
 
 router.get('/products', async (req, res) => {
-    try {
+    try {   
+        if (!req.session.user) {
+            return res.redirect('/login');
+        }
         const response = await productManager.getProducts(req)
         response.payload = response.payload.map((element) => element.toObject()) // Hago del payload objetos planos
         const result = {

@@ -8,6 +8,7 @@ import { createHash, isValidPassword } from '../utils.js'
 dotenv.config()
 
 const ADMIN = {
+    _id: 0,
     first_name: "Coder",
     last_name: "House",
     age: 20,
@@ -32,9 +33,10 @@ const initializePassport = () => {
                 let newUser = {
                     first_name:profile._json.name,
                     last_name:"",
-                    age:89,
+                    age:30,
                     email:profile._json.email,
-                    password:""
+                    password:"",
+                    rol:"usuario"
                 }
                 let result = await userService.create(newUser)
                 done(null,result)
@@ -74,14 +76,14 @@ const initializePassport = () => {
     ))
 
     passport.serializeUser((user, done) => {
-        done(null,user.email)
+        done(null,user._id)
     })
 
-    passport.deserializeUser( async(email, done) => {
-        if(email === ADMIN.email) {
+    passport.deserializeUser( async(id, done) => {
+        if(id === ADMIN._id) {
             done(null,ADMIN)
         } else {
-            done(null,await userService.findOne({email}))
+            done(null,await userService.findById(id))
         }
     })
 
